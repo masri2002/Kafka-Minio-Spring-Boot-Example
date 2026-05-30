@@ -1,11 +1,13 @@
 package com.minio.example.service;
 
+import com.minio.example.dto.FileEvent;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -19,37 +21,37 @@ public class MinioService {
     @Value("${minio.bucket}")
     private String defaultBucket;
 
-    public void uploadFile(String bucket, String objectName, String filePath, String contentType)
+    public void uploadFile(FileEvent event)
             throws Exception {
-        ensureBucketExists(bucket);
+        ensureBucketExists(event.getBucketName());
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectName)
-                        .filename(filePath)
-                        .contentType(contentType)
+                        .bucket(event.getBucketName())
+                        .object(event.getObjectName())
+                        .filename(event.getFilePath())
+                        .contentType(event.getContentType())
                         .build()
         );
-        log.info("Uploaded: {}/{}", bucket, objectName);
+        log.info("Uploaded: {}/{}", event.getBucketName(), event.getObjectName());
     }
 
-    public InputStream downloadFile(String bucket, String objectName) throws Exception {
+    public InputStream downloadFile(FileEvent event) throws Exception {
         return minioClient.getObject(
                 GetObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectName)
+                        .bucket(event.getBucketName())
+                        .object(event.getObjectName())
                         .build()
         );
     }
 
-    public void deleteFile(String bucket, String objectName) throws Exception {
+    public void deleteFile(FileEvent event) throws Exception {
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectName)
+                        .bucket(event.getBucketName())
+                        .object(event.getObjectName())
                         .build()
         );
-        log.info("Deleted: {}/{}", bucket, objectName);
+        log.info("Deleted: {}/{}", event.getBucketName(), event.getObjectName());
     }
 
     private void ensureBucketExists(String bucket) throws Exception {

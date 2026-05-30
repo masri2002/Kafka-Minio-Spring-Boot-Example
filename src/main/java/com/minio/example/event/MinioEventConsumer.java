@@ -2,6 +2,7 @@ package com.minio.example.event;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minio.example.dto.FileEvent;
 import com.minio.example.dto.Person;
 import com.minio.example.parsers.CsvParsers;
 import com.minio.example.service.MinioService;
@@ -97,7 +98,11 @@ public class MinioEventConsumer {
 
     private void deleteFile(String bucket, String objectName) {
         try {
-            minioService.deleteFile(bucket, objectName);
+            FileEvent event = new FileEvent.FileEventBulider()
+                    .bucketName(bucket)
+                    .objectName(objectName)
+                    .build();
+            minioService.deleteFile(event);
             log.info("Deleted after processing: {}/{}", bucket, objectName);
         } catch (Exception e) {
             log.error("Failed to delete {}/{}: {}", bucket, objectName, e.getMessage());

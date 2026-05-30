@@ -48,7 +48,37 @@ public class CsvParsers {
         int age = Integer.parseInt(columns[2].trim());
         String country = columns[3].trim();
 
-        return new Person(firstName, lastName, age, country);
+        return new Person.PersonBulider()
+                .firstName(firstName)
+                .lastName(lastName)
+                .age(age)
+                .country(country)
+                .build();
     }
+
+    private Person parseLineToObjectWithPassportId(String line) {
+        String[] columns = line.trim().split(",");
+
+        if (columns.length < 4) {
+            throw new IllegalArgumentException(
+                    "Expected 4 columns (firstName,lastName,age,country) but got " + columns.length
+            );
+        }
+
+        String firstName = columns[0].trim();
+        String lastName = columns[1].trim();
+        int age = Integer.parseInt(columns[2].trim());
+        String country = columns[3].trim();
+        String passportId = columns[4].trim();
+
+        return new Person.PersonBulider()
+                .firstName(firstName)
+                .lastName(lastName)
+                .age(age)
+                .country(country)
+                .passportId(passportId)
+                .build();
+    }
+
 
 }

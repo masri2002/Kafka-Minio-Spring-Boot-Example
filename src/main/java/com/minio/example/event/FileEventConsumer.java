@@ -20,11 +20,7 @@ public class FileEventConsumer {
     public void handleUpload(FileEvent event) {
         log.info("Upload event received: {}", event.getObjectName());
         try {
-            minioService.uploadFile(
-                    event.getBucketName(),
-                    event.getObjectName(),
-                    event.getFilePath(),
-                    event.getContentType()
+            minioService.uploadFile(event
             );
         } catch (Exception e) {
             log.error("Upload failed: {}", e.getMessage());
@@ -34,8 +30,7 @@ public class FileEventConsumer {
     @KafkaListener(topics = "file-download-events", groupId = "file-service-group")
     public void handleDownload(FileEvent event) {
         log.info("Download event received: {}", event.getObjectName());
-        try (InputStream stream = minioService.downloadFile(
-                event.getBucketName(), event.getObjectName())) {
+        try (InputStream stream = minioService.downloadFile(event)) {
             log.info("Downloaded {} bytes", stream.available());
         } catch (Exception e) {
             log.error("Download failed: {}", e.getMessage());
@@ -46,7 +41,7 @@ public class FileEventConsumer {
     public void handleDelete(FileEvent event) {
         log.info("Delete event received: {}", event.getObjectName());
         try {
-            minioService.deleteFile(event.getBucketName(), event.getObjectName());
+            minioService.deleteFile(event);
         } catch (Exception e) {
             log.error("Delete failed: {}", e.getMessage());
         }
